@@ -1,0 +1,5 @@
+/* App-specific styles - most styles should be in the design system (index.css) */
+
+.card {
+  padding: 2em;
+}
