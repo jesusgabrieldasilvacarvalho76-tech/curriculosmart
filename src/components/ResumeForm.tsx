@@ -51,13 +51,27 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
 
     setIsImprovingExperience(true);
     try {
-      const response = await fetch('/api/improve-experience', {
+      const response = await fetch('https://api.perplexity.ai/chat/completions', {
         method: 'POST',
         headers: {
+          'Authorization': 'Bearer sk-de2048c8256c44699b8d7477ba1381e5',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          experiencia_profissional: formData.experience,
+          model: 'llama-3.1-sonar-small-128k-online',
+          messages: [
+            {
+              role: 'system',
+              content: 'Você é um especialista em recursos humanos e redação profissional. Melhore o texto da experiência profissional fornecido, tornando-o mais atrativo para recrutadores, usando linguagem profissional e destacando conquistas e responsabilidades. Mantenha a veracidade das informações. Responda apenas com o texto melhorado, sem explicações adicionais.'
+            },
+            {
+              role: 'user',
+              content: `Melhore este texto de experiência profissional: ${formData.experience}`
+            }
+          ],
+          temperature: 0.3,
+          top_p: 0.9,
+          max_tokens: 800,
         }),
       });
 
@@ -66,10 +80,10 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
       }
 
       const data = await response.json();
-      const improvedText = data.improvedText || data.texto_melhorado || data.result;
+      const improvedText = data.choices?.[0]?.message?.content;
       
       if (improvedText) {
-        handleInputChange('experience', improvedText);
+        handleInputChange('experience', improvedText.trim());
         toast({
           title: "Texto melhorado!",
           description: "Sua experiência profissional foi aprimorada pela IA.",
