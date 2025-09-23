@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { PhotoUpload } from './PhotoUpload';
 import { FormData } from '@/types/resume';
 import { Sparkles } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface ResumeFormProps {
   onFormChange: (data: FormData) => void;
@@ -15,6 +16,7 @@ interface ResumeFormProps {
 }
 
 export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFormProps) => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     birthDate: '',
@@ -23,6 +25,7 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
     desiredPosition: '',
     experience: '',
   });
+  const [isImprovingExperience, setIsImprovingExperience] = useState(false);
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     const updatedData = { ...formData, [field]: value };
@@ -34,6 +37,53 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
     const updatedData = { ...formData, photo: file || undefined };
     setFormData(updatedData);
     onFormChange(updatedData);
+  };
+
+  const handleImproveExperience = async () => {
+    if (!formData.experience.trim()) {
+      toast({
+        title: "Campo vazio",
+        description: "Por favor, escreva algo sobre sua experiência profissional primeiro.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsImprovingExperience(true);
+    try {
+      const response = await fetch('/api/improve-experience', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          experiencia_profissional: formData.experience,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao melhorar o texto');
+      }
+
+      const data = await response.json();
+      const improvedText = data.improvedText || data.texto_melhorado || data.result;
+      
+      if (improvedText) {
+        handleInputChange('experience', improvedText);
+        toast({
+          title: "Texto melhorado!",
+          description: "Sua experiência profissional foi aprimorada pela IA.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível melhorar o texto. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImprovingExperience(false);
+    }
   };
 
   const isFormValid = formData.fullName && formData.phone && formData.email && 
@@ -122,9 +172,11 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
                 variant="outline"
                 size="sm"
                 className="px-2 py-1 h-6 text-xs"
+                onClick={handleImproveExperience}
+                disabled={isImprovingExperience || !formData.experience.trim()}
               >
                 <Sparkles className="w-3 h-3 mr-1" />
-                IA
+                {isImprovingExperience ? 'Melhorando...' : 'IA'}
               </Button>
             </div>
             <Textarea
