@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { PhotoUpload } from './PhotoUpload';
 import { FormData } from '@/types/resume';
+import { Sparkles } from 'lucide-react';
 
 interface ResumeFormProps {
   onFormChange: (data: FormData) => void;
@@ -114,7 +115,18 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
           </div>
 
           <div>
-            <Label htmlFor="experience">Experiência Profissional *</Label>
+            <div className="flex items-center gap-2 mb-1">
+              <Label htmlFor="experience">Experiência Profissional *</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="px-2 py-1 h-6 text-xs"
+              >
+                <Sparkles className="w-3 h-3 mr-1" />
+                IA
+              </Button>
+            </div>
             <Textarea
               id="experience"
               value={formData.experience}
