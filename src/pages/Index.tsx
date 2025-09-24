@@ -6,7 +6,8 @@ import { generateResumeData } from '@/utils/resumeGenerator';
 import { FormData, ResumeData } from '@/types/resume';
 import { useToast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
-import { FileText, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { FileText, Sparkles, Download, MessageCircle, Share2 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
 const Index = () => {
@@ -15,11 +16,11 @@ const Index = () => {
   const [photoUrl, setPhotoUrl] = useState<string>();
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<ColorTheme>({
-    primary: "0 0% 0%",
-    accent: "0 0% 40%",
+    primary: "214 84% 56%",
+    accent: "45 93% 47%",
     background: "0 0% 100%",
-    foreground: "0 0% 0%",
-    fontFamily: "classic"
+    foreground: "216 15% 15%",
+    fontFamily: "sans"
   });
   const { toast } = useToast();
 
@@ -75,41 +76,6 @@ const Index = () => {
       const element = document.getElementById('resume-preview');
       if (!element) return;
 
-      // Convert HSL color to hex for PDF background
-      const hslToHex = (hsl: string) => {
-        const [h, s, l] = hsl.split(' ').map(val => parseFloat(val.replace('%', '')));
-        const sDecimal = s / 100;
-        const lDecimal = l / 100;
-        
-        const c = (1 - Math.abs(2 * lDecimal - 1)) * sDecimal;
-        const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-        const m = lDecimal - c / 2;
-        
-        let r = 0, g = 0, b = 0;
-        
-        if (0 <= h && h < 60) {
-          r = c; g = x; b = 0;
-        } else if (60 <= h && h < 120) {
-          r = x; g = c; b = 0;
-        } else if (120 <= h && h < 180) {
-          r = 0; g = c; b = x;
-        } else if (180 <= h && h < 240) {
-          r = 0; g = x; b = c;
-        } else if (240 <= h && h < 300) {
-          r = x; g = 0; b = c;
-        } else if (300 <= h && h < 360) {
-          r = c; g = 0; b = x;
-        }
-        
-        r = Math.round((r + m) * 255);
-        g = Math.round((g + m) * 255);
-        b = Math.round((b + m) * 255);
-        
-        return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
-      };
-
-      const backgroundColor = hslToHex(selectedTheme.background);
-
       const opt = {
         margin: [0.5, 0.5, 0.5, 0.5] as [number, number, number, number],
         filename: `curriculo-${resumeData.personalInfo.fullName.replace(/\s+/g, '-').toLowerCase()}.pdf`,
@@ -118,7 +84,7 @@ const Index = () => {
           scale: 2,
           useCORS: true,
           allowTaint: true,
-          backgroundColor
+          backgroundColor: '#ffffff'
         },
         jsPDF: { 
           unit: 'in' as const, 
@@ -140,6 +106,37 @@ const Index = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleShareWhatsApp = () => {
+    if (!resumeData) return;
+    
+    const message = `Olá! Acabei de criar meu currículo profissional. 
+    
+🎯 *${resumeData.personalInfo.fullName}*
+📧 ${resumeData.personalInfo.email}
+📱 ${resumeData.personalInfo.phone}
+💼 ${resumeData.professionalInfo.desiredPosition}
+
+${resumeData.summary}
+
+Criei usando um gerador profissional de currículos!`;
+    
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+  };
+
+  const handleShareLinkedIn = () => {
+    if (!resumeData) return;
+    
+    const summary = encodeURIComponent(`Acabei de atualizar meu perfil profissional! 
+
+🎯 ${resumeData.professionalInfo.desiredPosition}
+${resumeData.summary}
+
+#OpenToWork #${resumeData.professionalInfo.desiredPosition.replace(/\s+/g, '')}`);
+    
+    window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${summary}`, '_blank');
   };
 
   return (
@@ -182,7 +179,40 @@ const Index = () => {
           </div>
 
           {/* Preview Section */}
-          <div>
+          <div className="space-y-6">
+            {resumeData && (
+              <div className="bg-gradient-accent p-4 rounded-lg shadow-elegant">
+                <h3 className="text-white font-bold text-lg mb-3 flex items-center gap-2">
+                  <Share2 className="w-5 h-5" />
+                  Seu currículo está pronto! Compartilhe agora:
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <Button 
+                    onClick={handleExportPDF} 
+                    variant="secondary"
+                    className="gap-2 font-bold bg-white text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    <Download className="w-4 h-4" />
+                    Baixar PDF
+                  </Button>
+                  <Button 
+                    onClick={handleShareWhatsApp}
+                    className="gap-2 font-bold bg-green-600 hover:bg-green-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    WhatsApp
+                  </Button>
+                  <Button 
+                    onClick={handleShareLinkedIn}
+                    className="gap-2 font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    LinkedIn
+                  </Button>
+                </div>
+              </div>
+            )}
+            
             <ResumePreview
               resumeData={resumeData}
               photoUrl={photoUrl}
