@@ -33,6 +33,7 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
   const [isImprovingExperience, setIsImprovingExperience] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [formProgress, setFormProgress] = useState(0);
+  const [deepseekApiKey, setDeepseekApiKey] = useState('');
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     let processedValue = value;
@@ -103,34 +104,44 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
       return;
     }
 
+    if (!deepseekApiKey.trim()) {
+      toast({
+        title: "API Key necessária",
+        description: "Por favor, insira sua chave de API da DeepSeek para usar a IA.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsImprovingExperience(true);
     try {
-      const response = await fetch('https://api.perplexity.ai/chat/completions', {
+      const prompt = `Você é uma IA especializada em melhorar descrições de experiência profissional. Receba o texto do usuário abaixo e gere uma versão aprimorada, mais clara, profissional e convincente, mantendo o estilo, tom e personalidade do autor.
+
+Texto do usuário:
+'${formData.experience}'
+
+Instruções:
+- Não invente experiências ou informações que não estejam no texto original.
+- Destaque responsabilidades, conquistas e projetos de forma concisa e organizada.
+- Mantenha o texto natural, fácil de ler e fluido.
+- Retorne apenas a versão melhorada do texto, sem comentários ou explicações adicionais.`;
+
+      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer sk-de2048c8256c44699b8d7477ba1381e5',
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${deepseekApiKey}`
         },
         body: JSON.stringify({
-          model: 'llama-3.1-sonar-small-128k-online',
-          messages: [
-            {
-              role: 'system',
-              content: 'Você é um especialista em recursos humanos e redação profissional. Melhore o texto da experiência profissional fornecido, tornando-o mais atrativo para recrutadores, usando linguagem profissional e destacando conquistas e responsabilidades. Mantenha a veracidade das informações. Responda apenas com o texto melhorado, sem explicações adicionais.'
-            },
-            {
-              role: 'user',
-              content: `Melhore este texto de experiência profissional: ${formData.experience}`
-            }
-          ],
-          temperature: 0.3,
-          top_p: 0.9,
-          max_tokens: 800,
-        }),
+          model: 'deepseek-chat',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 1000,
+          temperature: 0.7
+        })
       });
 
       if (!response.ok) {
-        throw new Error('Falha ao melhorar o texto');
+        throw new Error(`Erro na API: ${response.status}`);
       }
 
       const data = await response.json();
@@ -146,7 +157,7 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Não foi possível melhorar o texto. Tente novamente.",
+        description: "Não foi possível melhorar o texto. Verifique sua API key e tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -375,12 +386,38 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
                 size="sm"
                 className="px-2 py-1 h-6 text-xs ml-auto"
                 onClick={handleImproveExperience}
-                disabled={isImprovingExperience || !formData.experience.trim()}
+                disabled={isImprovingExperience || !formData.experience.trim() || !deepseekApiKey.trim()}
               >
                 <Sparkles className="w-3 h-3 mr-1" />
                 {isImprovingExperience ? 'Melhorando...' : 'Melhorar com IA'}
               </Button>
             </div>
+            
+            <div className="mb-3 p-3 bg-accent/10 border border-accent/20 rounded-lg">
+              <Label htmlFor="deepseekApiKey" className="text-xs">
+                Chave de API DeepSeek (obrigatória para IA)
+              </Label>
+              <Input
+                id="deepseekApiKey"
+                type="password"
+                value={deepseekApiKey}
+                onChange={(e) => setDeepseekApiKey(e.target.value)}
+                placeholder="sk-..."
+                className="mt-1 text-sm"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Obtenha sua chave em{' '}
+                <a 
+                  href="https://platform.deepseek.com/api_keys" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  platform.deepseek.com
+                </a>
+              </p>
+            </div>
+
             <Textarea
               id="experience"
               value={formData.experience}
