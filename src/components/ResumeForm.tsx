@@ -103,12 +103,22 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
       return;
     }
 
+    // Preservar o texto original antes de iniciar o processamento
+    const originalText = formData.experience;
+    
     setIsImprovingExperience(true);
+    
+    // Mostrar toast informando que está processando
+    toast({
+      title: "Gerando melhoria...",
+      description: "A IA está aprimorando seu texto. Aguarde um momento.",
+    });
+
     try {
       const { supabase } = await import('@/integrations/supabase/client');
       
       const { data, error } = await supabase.functions.invoke('improve-experience', {
-        body: { experienceText: formData.experience }
+        body: { experienceText: originalText }
       });
 
       if (error) {
@@ -116,17 +126,27 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
       }
 
       if (data?.improvedText) {
+        // Atualizar apenas se houver resposta válida
         handleInputChange('experience', data.improvedText);
         toast({
           title: "Texto melhorado!",
           description: "Sua experiência profissional foi aprimorada pela IA.",
         });
+      } else {
+        // Se não houver resposta, manter o texto original
+        toast({
+          title: "Aviso",
+          description: "Não foi possível gerar uma melhoria. Seu texto original foi mantido.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Erro ao melhorar texto:', error);
+      // Em caso de erro, garantir que o texto original permanece
+      // O texto já está no formData, então não precisamos fazer nada
       toast({
         title: "Não foi possível melhorar o texto agora.",
-        description: "Por favor, tente novamente mais tarde.",
+        description: "Seu texto original foi preservado. Tente novamente mais tarde.",
         variant: "destructive",
       });
     } finally {
