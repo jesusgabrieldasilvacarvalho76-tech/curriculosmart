@@ -1,1 +1,4 @@
 project_id = "ntolkvtlazefommdlfyy"
+
+[functions.improve-experience]
+verify_jwt = false
