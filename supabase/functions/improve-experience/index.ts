@@ -25,9 +25,9 @@ serve(async (req) => {
       );
     }
 
-    const deepseekApiKey = Deno.env.get('DEEPSEEK_API_KEY');
-    if (!deepseekApiKey) {
-      console.error('DEEPSEEK_API_KEY não configurado');
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+    if (!lovableApiKey) {
+      console.error('LOVABLE_API_KEY não configurado');
       return new Response(
         JSON.stringify({ error: 'Configuração da API não encontrada' }), 
         { 
@@ -48,25 +48,47 @@ Instruções:
 - Mantenha o texto natural, fluido e fácil de ler.
 - Retorne apenas a versão melhorada do texto, sem comentários ou explicações adicionais.`;
 
-    console.log('Enviando requisição para DeepSeek API...');
+    console.log('Enviando requisição para Lovable AI (Google Gemini)...');
     
-    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${deepseekApiKey}`
+        'Authorization': `Bearer ${lovableApiKey}`
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: 'google/gemini-2.5-flash',
         messages: [{ role: 'user', content: prompt }],
-        max_tokens: 1000,
-        temperature: 0.7
+        max_tokens: 1000
       })
     });
 
     if (!response.ok) {
+      // Tratamento especial para rate limits e falta de créditos
+      if (response.status === 429) {
+        console.error('Rate limit excedido');
+        return new Response(
+          JSON.stringify({ error: 'Muitas requisições. Aguarde alguns instantes e tente novamente.' }), 
+          { 
+            status: 429, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+      
+      if (response.status === 402) {
+        console.error('Créditos insuficientes');
+        return new Response(
+          JSON.stringify({ error: 'Créditos insuficientes. Adicione créditos em Settings -> Workspace -> Usage.' }), 
+          { 
+            status: 402, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+
       const errorText = await response.text();
-      console.error(`Erro na API DeepSeek (${response.status}):`, errorText);
+      console.error(`Erro na API Lovable AI (${response.status}):`, errorText);
       return new Response(
         JSON.stringify({ error: `Erro na API: ${response.status}` }), 
         { 
@@ -90,7 +112,7 @@ Instruções:
       );
     }
 
-    console.log('Texto melhorado com sucesso');
+    console.log('Texto melhorado com sucesso usando Google Gemini');
     
     return new Response(
       JSON.stringify({ improvedText: improvedText.trim() }), 

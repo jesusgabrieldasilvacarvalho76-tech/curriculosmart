@@ -16,6 +16,19 @@ interface ResumePreviewProps {
   colorTheme: ColorTheme;
 }
 
+const getFontFamily = (fontFamily: string): string => {
+  const fontMap: Record<string, string> = {
+    'classic': 'Times New Roman, serif',
+    'sans': 'Inter, system-ui, sans-serif',
+    'playfair': 'Playfair Display, serif',
+    'merriweather': 'Merriweather, serif',
+    'open-sans': 'Open Sans, sans-serif',
+    'lora': 'Lora, serif',
+    'source-sans': 'Source Sans Pro, sans-serif'
+  };
+  return fontMap[fontFamily] || fontMap['sans'];
+};
+
 export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResume, colorTheme }: ResumePreviewProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<ResumeData | null>(null);
@@ -99,10 +112,11 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
 
       <Card 
         id="resume-preview" 
-        className={`p-8 shadow-card print:shadow-none print:border-none font-${colorTheme.fontFamily}`}
+        className="p-8 shadow-card print:shadow-none print:border-none"
         style={{ 
           backgroundColor: `hsl(${colorTheme.background})`,
-          color: `hsl(${colorTheme.foreground})`
+          color: `hsl(${colorTheme.foreground})`,
+          fontFamily: getFontFamily(colorTheme.fontFamily)
         }}
       >
         {/* Header Section */}
