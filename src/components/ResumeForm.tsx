@@ -9,10 +9,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Combobox } from '@/components/ui/combobox';
 import { PhotoUpload } from './PhotoUpload';
 import { FormData } from '@/types/resume';
-import { Sparkles, HelpCircle, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Sparkles, HelpCircle, CheckCircle2, AlertCircle, Plus, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PROFESSION_OPTIONS } from '@/data/professions';
 import { formatPhoneNumber, validateEmail, validatePhone, calculateFormProgress } from '@/utils/formatters';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { EducationItem } from '@/types/resume';
 
 interface ResumeFormProps {
   onFormChange: (data: FormData) => void;
@@ -29,6 +31,7 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
     email: '',
     desiredPosition: '',
     experience: '',
+    education: [],
   });
   const [isImprovingExperience, setIsImprovingExperience] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -89,6 +92,35 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
 
   const handlePhotoChange = (file: File | null) => {
     const updatedData = { ...formData, photo: file || undefined };
+    setFormData(updatedData);
+    onFormChange(updatedData);
+  };
+
+  const addEducationItem = () => {
+    const newItem: EducationItem = {
+      level: '',
+      status: '',
+      institution: '',
+      course: '',
+      period: '',
+    };
+    const updatedData = { ...formData, education: [...formData.education, newItem] };
+    setFormData(updatedData);
+    onFormChange(updatedData);
+  };
+
+  const removeEducationItem = (index: number) => {
+    const updatedEducation = formData.education.filter((_, i) => i !== index);
+    const updatedData = { ...formData, education: updatedEducation };
+    setFormData(updatedData);
+    onFormChange(updatedData);
+  };
+
+  const updateEducationItem = (index: number, field: keyof EducationItem, value: string) => {
+    const updatedEducation = formData.education.map((item, i) => 
+      i === index ? { ...item, [field]: value } : item
+    );
+    const updatedData = { ...formData, education: updatedEducation };
     setFormData(updatedData);
     onFormChange(updatedData);
   };
@@ -394,7 +426,115 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
         </div>
 
         <div className="space-y-4">
-          <Button 
+          <div className="flex items-center justify-between">
+            <h3 className="text-heading-sm text-foreground">Formação Acadêmica</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Adicione suas formações acadêmicas</p>
+                <p className="text-xs mt-1">Comece pela mais recente</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          
+          {formData.education.map((item, index) => (
+            <Card key={index} className="p-4 space-y-3 relative">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute top-2 right-2 h-8 w-8 p-0"
+                onClick={() => removeEducationItem(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Nível *</Label>
+                  <Select 
+                    value={item.level} 
+                    onValueChange={(value) => updateEducationItem(index, 'level', value)}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecione o nível" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ensino-medio">Ensino Médio</SelectItem>
+                      <SelectItem value="tecnico">Técnico</SelectItem>
+                      <SelectItem value="graduacao">Graduação</SelectItem>
+                      <SelectItem value="pos-graduacao">Pós-graduação</SelectItem>
+                      <SelectItem value="mestrado">Mestrado</SelectItem>
+                      <SelectItem value="doutorado">Doutorado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Status *</Label>
+                  <Select 
+                    value={item.status} 
+                    onValueChange={(value) => updateEducationItem(index, 'status', value)}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecione o status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="completo">Completo</SelectItem>
+                      <SelectItem value="cursando">Cursando</SelectItem>
+                      <SelectItem value="incompleto">Incompleto</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label>Instituição *</Label>
+                <Input
+                  value={item.institution}
+                  onChange={(e) => updateEducationItem(index, 'institution', e.target.value)}
+                  placeholder="Nome da escola, universidade ou curso"
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label>Curso</Label>
+                <Input
+                  value={item.course || ''}
+                  onChange={(e) => updateEducationItem(index, 'course', e.target.value)}
+                  placeholder="Ex: Administração, Técnico em Informática (opcional)"
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label>Período *</Label>
+                <Input
+                  value={item.period}
+                  onChange={(e) => updateEducationItem(index, 'period', e.target.value)}
+                  placeholder="Ex: 2020-2024 ou 2023-Atual"
+                  className="mt-1"
+                />
+              </div>
+            </Card>
+          ))}
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addEducationItem}
+            className="w-full"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Adicionar Formação
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          <Button
             onClick={onGenerate}
             disabled={!isFormValid || isGenerating}
             variant="gradient-accent"

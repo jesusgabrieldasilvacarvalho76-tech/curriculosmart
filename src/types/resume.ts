@@ -19,6 +19,14 @@ export interface ResumeData {
   summary: string;
 }
 
+export interface EducationItem {
+  level: string; // "ensino-medio" | "graduacao" | "pos-graduacao" | "tecnico" | "outro"
+  status: string; // "completo" | "incompleto" | "cursando"
+  institution: string;
+  course?: string;
+  period: string; // "2020-2024" ou "2020-Atual"
+}
+
 export interface FormData {
   fullName: string;
   birthDate: string;
@@ -26,5 +34,6 @@ export interface FormData {
   email: string;
   desiredPosition: string;
   experience: string;
+  education: EducationItem[];
   photo?: File;
 }

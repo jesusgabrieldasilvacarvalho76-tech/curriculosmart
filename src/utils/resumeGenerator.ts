@@ -1,8 +1,10 @@
-import { FormData, ResumeData } from '@/types/resume';
+import { FormData, ResumeData, EducationItem } from '@/types/resume';
 
 export const generateResumeData = (formData: FormData): ResumeData => {
   const skills = generateSkillsFromExperience(formData.experience, formData.desiredPosition);
-  const education = generateEducationSuggestions(formData.desiredPosition);
+  const education = formData.education.length > 0 
+    ? formatEducationData(formData.education)
+    : generateEducationSuggestions(formData.desiredPosition);
   const summary = generateProfessionalSummary(formData.desiredPosition, formData.experience);
 
   return {
@@ -80,6 +82,31 @@ const extractSkillsFromText = (text: string): string[] => {
   });
 
   return foundSkills.slice(0, 5);
+};
+
+const formatEducationData = (educationItems: EducationItem[]): string[] => {
+  const levelMap: Record<string, string> = {
+    'ensino-medio': 'Ensino Médio',
+    'tecnico': 'Curso Técnico',
+    'graduacao': 'Graduação',
+    'pos-graduacao': 'Pós-graduação',
+    'mestrado': 'Mestrado',
+    'doutorado': 'Doutorado',
+  };
+
+  const statusMap: Record<string, string> = {
+    'completo': 'Completo',
+    'cursando': 'Cursando',
+    'incompleto': 'Incompleto',
+  };
+
+  return educationItems.map(item => {
+    const level = levelMap[item.level] || item.level;
+    const status = statusMap[item.status] || item.status;
+    const course = item.course ? ` em ${item.course}` : '';
+    
+    return `${level}${course} - ${item.institution} (${status}) - ${item.period}`;
+  });
 };
 
 const generateEducationSuggestions = (position: string): string[] => {
