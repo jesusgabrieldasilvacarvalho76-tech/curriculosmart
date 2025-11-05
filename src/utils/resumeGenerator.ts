@@ -1,4 +1,4 @@
-import { FormData, ResumeData, EducationItem } from '@/types/resume';
+import { FormData, ResumeData, EducationItem, Language, Certification } from '@/types/resume';
 
 export const generateResumeData = (formData: FormData): ResumeData => {
   const skills = generateSkillsFromExperience(formData.experience, formData.desiredPosition);
@@ -6,6 +6,14 @@ export const generateResumeData = (formData: FormData): ResumeData => {
     ? formatEducationData(formData.education)
     : generateEducationSuggestions(formData.desiredPosition);
   const summary = generateProfessionalSummary(formData.desiredPosition, formData.experience);
+  
+  const languages = formData.languages.length > 0 
+    ? formatLanguageData(formData.languages)
+    : undefined;
+    
+  const certifications = formData.certifications.length > 0
+    ? formatCertificationData(formData.certifications)
+    : undefined;
 
   return {
     personalInfo: {
@@ -21,6 +29,8 @@ export const generateResumeData = (formData: FormData): ResumeData => {
     skills,
     education,
     summary,
+    languages,
+    certifications,
   };
 };
 
@@ -158,4 +168,26 @@ const generateProfessionalSummary = (position: string, experience: string): stri
   }
 
   return templates.default;
+};
+
+const formatLanguageData = (languages: Language[]): Language[] => {
+  const proficiencyMap: Record<string, string> = {
+    'basico': 'Básico',
+    'intermediario': 'Intermediário',
+    'avancado': 'Avançado',
+    'fluente': 'Fluente',
+  };
+
+  return languages.map(lang => ({
+    name: lang.name,
+    proficiency: proficiencyMap[lang.proficiency] || lang.proficiency,
+  }));
+};
+
+const formatCertificationData = (certifications: Certification[]): Certification[] => {
+  return certifications.map(cert => ({
+    name: cert.name,
+    institution: cert.institution,
+    year: cert.year,
+  }));
 };

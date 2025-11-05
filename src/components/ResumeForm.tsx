@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Combobox } from '@/components/ui/combobox';
 import { PhotoUpload } from './PhotoUpload';
-import { FormData } from '@/types/resume';
+import { FormData, Language, Certification } from '@/types/resume';
 import { Sparkles, HelpCircle, CheckCircle2, AlertCircle, Plus, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { PROFESSION_OPTIONS } from '@/data/professions';
@@ -32,6 +32,8 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
     desiredPosition: '',
     experience: '',
     education: [],
+    languages: [],
+    certifications: [],
   });
   const [isImprovingExperience, setIsImprovingExperience] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -121,6 +123,59 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
       i === index ? { ...item, [field]: value } : item
     );
     const updatedData = { ...formData, education: updatedEducation };
+    setFormData(updatedData);
+    onFormChange(updatedData);
+  };
+
+  const addLanguage = () => {
+    const newLanguage: Language = {
+      name: '',
+      proficiency: '',
+    };
+    const updatedData = { ...formData, languages: [...formData.languages, newLanguage] };
+    setFormData(updatedData);
+    onFormChange(updatedData);
+  };
+
+  const removeLanguage = (index: number) => {
+    const updatedLanguages = formData.languages.filter((_, i) => i !== index);
+    const updatedData = { ...formData, languages: updatedLanguages };
+    setFormData(updatedData);
+    onFormChange(updatedData);
+  };
+
+  const updateLanguage = (index: number, field: keyof Language, value: string) => {
+    const updatedLanguages = formData.languages.map((item, i) => 
+      i === index ? { ...item, [field]: value } : item
+    );
+    const updatedData = { ...formData, languages: updatedLanguages };
+    setFormData(updatedData);
+    onFormChange(updatedData);
+  };
+
+  const addCertification = () => {
+    const newCertification: Certification = {
+      name: '',
+      institution: '',
+      year: '',
+    };
+    const updatedData = { ...formData, certifications: [...formData.certifications, newCertification] };
+    setFormData(updatedData);
+    onFormChange(updatedData);
+  };
+
+  const removeCertification = (index: number) => {
+    const updatedCertifications = formData.certifications.filter((_, i) => i !== index);
+    const updatedData = { ...formData, certifications: updatedCertifications };
+    setFormData(updatedData);
+    onFormChange(updatedData);
+  };
+
+  const updateCertification = (index: number, field: keyof Certification, value: string) => {
+    const updatedCertifications = formData.certifications.map((item, i) => 
+      i === index ? { ...item, [field]: value } : item
+    );
+    const updatedData = { ...formData, certifications: updatedCertifications };
     setFormData(updatedData);
     onFormChange(updatedData);
   };
@@ -530,6 +585,146 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
           >
             <Plus className="w-4 h-4 mr-2" />
             Adicionar Formação
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-heading-sm text-foreground">Idiomas</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Adicione idiomas que você domina</p>
+                <p className="text-xs mt-1">Seja honesto sobre seu nível</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          
+          {formData.languages.map((item, index) => (
+            <Card key={index} className="p-4 space-y-3 relative">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute top-2 right-2 h-8 w-8 p-0"
+                onClick={() => removeLanguage(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Idioma *</Label>
+                  <Input
+                    value={item.name}
+                    onChange={(e) => updateLanguage(index, 'name', e.target.value)}
+                    placeholder="Ex: Inglês, Espanhol..."
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label>Nível *</Label>
+                  <Select 
+                    value={item.proficiency} 
+                    onValueChange={(value) => updateLanguage(index, 'proficiency', value)}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Selecione o nível" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="basico">Básico</SelectItem>
+                      <SelectItem value="intermediario">Intermediário</SelectItem>
+                      <SelectItem value="avancado">Avançado</SelectItem>
+                      <SelectItem value="fluente">Fluente</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </Card>
+          ))}
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addLanguage}
+            className="w-full"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Adicionar Idioma
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-heading-sm text-foreground">Certificações</h3>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Adicione certificações e cursos relevantes</p>
+                <p className="text-xs mt-1">Certificados aumentam suas chances</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          
+          {formData.certifications.map((item, index) => (
+            <Card key={index} className="p-4 space-y-3 relative">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute top-2 right-2 h-8 w-8 p-0"
+                onClick={() => removeCertification(index)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+
+              <div>
+                <Label>Nome da Certificação *</Label>
+                <Input
+                  value={item.name}
+                  onChange={(e) => updateCertification(index, 'name', e.target.value)}
+                  placeholder="Ex: AWS Certified, Google Analytics..."
+                  className="mt-1"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Instituição *</Label>
+                  <Input
+                    value={item.institution}
+                    onChange={(e) => updateCertification(index, 'institution', e.target.value)}
+                    placeholder="Ex: Google, Amazon..."
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label>Ano</Label>
+                  <Input
+                    value={item.year || ''}
+                    onChange={(e) => updateCertification(index, 'year', e.target.value)}
+                    placeholder="Ex: 2023"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </Card>
+          ))}
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addCertification}
+            className="w-full"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Adicionar Certificação
           </Button>
         </div>
 

@@ -298,7 +298,7 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
 
         {/* Education */}
         {currentData.education.length > 0 && (
-          <section>
+          <section className="mb-8">
             <h2 
               className="text-heading-sm pb-2 mb-4 border-b-2"
               style={{ 
@@ -329,6 +329,63 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
                 ))}
               </div>
             )}
+          </section>
+        )}
+
+        {/* Languages */}
+        {currentData.languages && currentData.languages.length > 0 && (
+          <section className="mb-8">
+            <h2 
+              className="text-heading-sm pb-2 mb-4 border-b-2"
+              style={{ 
+                color: `hsl(${colorTheme.primary})`,
+                borderColor: `hsl(${colorTheme.primary} / 0.2)`
+              }}
+            >
+              Idiomas
+            </h2>
+            <div className="grid grid-cols-2 gap-3">
+              {currentData.languages.map((lang, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div 
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: `hsl(${colorTheme.accent})` }}
+                  ></div>
+                  <span style={{ color: `hsl(${colorTheme.foreground})` }}>
+                    {lang.name} - {lang.proficiency}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Certifications */}
+        {currentData.certifications && currentData.certifications.length > 0 && (
+          <section>
+            <h2 
+              className="text-heading-sm pb-2 mb-4 border-b-2"
+              style={{ 
+                color: `hsl(${colorTheme.primary})`,
+                borderColor: `hsl(${colorTheme.primary} / 0.2)`
+              }}
+            >
+              Certificações
+            </h2>
+            <div className="space-y-2">
+              {currentData.certifications.map((cert, index) => (
+                <div key={index} className="flex gap-3">
+                  <div 
+                    className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                    style={{ backgroundColor: `hsl(${colorTheme.accent})` }}
+                  ></div>
+                  <p style={{ color: `hsl(${colorTheme.foreground})` }}>
+                    {cert.name} - {cert.institution}
+                    {cert.year && ` (${cert.year})`}
+                  </p>
+                </div>
+              ))}
+            </div>
           </section>
         )}
       </Card>
