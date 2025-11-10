@@ -1,13 +1,15 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ResumeForm } from '@/components/ResumeForm';
 import { ResumePreview } from '@/components/ResumePreview';
 import { ColorCustomizer, ColorTheme } from '@/components/ColorCustomizer';
 import { generateResumeData } from '@/utils/resumeGenerator';
 import { FormData, ResumeData } from '@/types/resume';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Sparkles, Download, MessageCircle, Share2 } from 'lucide-react';
+import { FileText, Sparkles, Download, MessageCircle, Share2, LogIn, LogOut, Crown } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
 const Index = () => {
@@ -23,6 +25,8 @@ const Index = () => {
     fontFamily: "sans"
   });
   const { toast } = useToast();
+  const { user, subscribed, signOut, checkSubscription } = useAuth();
+  const navigate = useNavigate();
 
   const handleFormChange = (data: FormData) => {
     setFormData(data);
@@ -36,6 +40,28 @@ const Index = () => {
 
   const handleGenerateResume = async () => {
     if (!formData) return;
+
+    // Check authentication
+    if (!user) {
+      toast({
+        title: "Login Necessário",
+        description: "Você precisa fazer login para gerar currículos.",
+        variant: "destructive",
+      });
+      navigate('/auth');
+      return;
+    }
+
+    // Check subscription
+    if (!subscribed) {
+      toast({
+        title: "Assinatura Necessária",
+        description: "Assine o plano profissional para gerar currículos.",
+        variant: "destructive",
+      });
+      navigate('/plans');
+      return;
+    }
 
     setIsGenerating(true);
     
@@ -70,7 +96,15 @@ const Index = () => {
   };
 
   const handleExportPDF = async () => {
-    if (!resumeData) return;
+    if (!resumeData || !subscribed) {
+      toast({
+        title: "Assinatura Necessária",
+        description: "Assine o plano profissional para exportar PDF.",
+        variant: "destructive",
+      });
+      navigate('/plans');
+      return;
+    }
     
     try {
       const element = document.getElementById('resume-preview');
@@ -144,17 +178,60 @@ ${resumeData.summary}
       {/* Header */}
       <header className="bg-card shadow-card border-b">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
-              <FileText className="w-6 h-6 text-primary-foreground" />
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
+                <FileText className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-heading-lg text-foreground">
+                  Criador de Currículos Profissionais
+                </h1>
+                <p className="text-muted-foreground">
+                  Crie seu currículo perfeito em minutos com IA
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-heading-lg text-foreground">
-                Criador de Currículos Profissionais
-              </h1>
-              <p className="text-muted-foreground">
-                Crie seu currículo perfeito em minutos com IA
-              </p>
+            
+            <div className="flex items-center gap-3">
+              {user ? (
+                <>
+                  {subscribed ? (
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={() => {
+                        checkSubscription();
+                        toast({
+                          title: "Status Atualizado",
+                          description: "Verificação de assinatura concluída.",
+                        });
+                      }}
+                    >
+                      <Crown className="w-4 h-4 text-yellow-500" />
+                      Plano Pro
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant="default" 
+                      className="gap-2"
+                      onClick={() => navigate('/plans')}
+                    >
+                      <Crown className="w-4 h-4" />
+                      Assinar Pro
+                    </Button>
+                  )}
+                  <Button variant="outline" className="gap-2" onClick={signOut}>
+                    <LogOut className="w-4 h-4" />
+                    Sair
+                  </Button>
+                </>
+              ) : (
+                <Button className="gap-2" onClick={() => navigate('/auth')}>
+                  <LogIn className="w-4 h-4" />
+                  Entrar
+                </Button>
+              )}
             </div>
           </div>
         </div>
