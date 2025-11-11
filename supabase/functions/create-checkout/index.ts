@@ -62,7 +62,7 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${origin}/`,
+      success_url: `${origin}/?payment=success`,
       cancel_url: `${origin}/plans`,
     });
 

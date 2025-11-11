@@ -45,6 +45,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    // Check for payment success parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success' && session?.user) {
+      // Force immediate subscription check after payment
+      setTimeout(() => {
+        checkSubscription();
+      }, 1000);
+      // Clean URL
+      window.history.replaceState({}, '', '/');
+    }
+  }, [session?.user]);
+
+  useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
