@@ -90,7 +90,7 @@ export default function Plans() {
               <CardTitle>Plano Profissional</CardTitle>
               <CardDescription>Recursos completos para destacar-se</CardDescription>
               <div className="mt-4">
-                <span className="text-3xl font-bold">R$ 29,90</span>
+                <span className="text-3xl font-bold">R$ 5,99</span>
                 <span className="text-muted-foreground">/mês</span>
               </div>
             </CardHeader>
