@@ -119,56 +119,74 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
           fontFamily: getFontFamily(colorTheme.fontFamily)
         }}
       >
-        {/* Header Section */}
-        <div className="flex justify-between items-start mb-8">
-          <div className="flex-1">
+        {/* Header Section - Professional Layout */}
+        <header className="flex flex-col md:flex-row items-center md:items-center gap-4 mb-8 pb-6 border-b" style={{ borderColor: 'hsl(0 0% 85%)' }}>
+          {/* Photo - Left side on desktop, top on mobile */}
+          {photoUrl && (
+            <div className="flex-shrink-0">
+              <img
+                src={photoUrl}
+                alt="Foto profissional"
+                className="w-[90px] h-[90px] object-cover rounded-lg"
+                style={{ 
+                  border: `2px solid hsl(${colorTheme.primary})`,
+                  borderRadius: '8px'
+                }}
+              />
+            </div>
+          )}
+          
+          {/* Name and Contact Info - Right side */}
+          <div className="flex-1 text-center md:text-left">
             {isEditing ? (
               <Input
                 value={currentData.personalInfo.fullName}
                 onChange={(e) => updateField(['personalInfo', 'fullName'], e.target.value)}
-                className="text-heading-xl text-primary mb-2 border-0 p-0 h-auto bg-transparent font-bold"
+                className="text-2xl md:text-3xl font-bold mb-2 border-0 p-0 h-auto bg-transparent"
+                style={{ color: 'hsl(0 0% 15%)' }}
               />
             ) : (
               <h1 
-                className="text-heading-xl mb-2"
-                style={{ color: `hsl(${colorTheme.primary})` }}
+                className="text-2xl md:text-3xl font-bold mb-2"
+                style={{ color: 'hsl(0 0% 15%)' }}
               >
                 {currentData.personalInfo.fullName}
               </h1>
             )}
             
-            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+            {/* Contact info in a single line */}
+            <div className="flex flex-wrap justify-center md:justify-start items-center gap-4 text-sm" style={{ color: 'hsl(0 0% 45%)' }}>
               {currentData.personalInfo.phone && (
-                <div className="flex items-center gap-1">
-                  <Phone className="w-4 h-4" />
+                <div className="flex items-center gap-1.5">
+                  <Phone className="w-4 h-4" style={{ color: `hsl(${colorTheme.primary})` }} />
                   {isEditing ? (
                     <Input
                       value={currentData.personalInfo.phone}
                       onChange={(e) => updateField(['personalInfo', 'phone'], e.target.value)}
-                      className="text-sm h-6 border-0 p-0 bg-transparent"
+                      className="text-sm h-6 border-0 p-0 bg-transparent w-32"
                     />
                   ) : (
-                    currentData.personalInfo.phone
+                    <span>{currentData.personalInfo.phone}</span>
                   )}
                 </div>
               )}
               {currentData.personalInfo.email && (
-                <div className="flex items-center gap-1">
-                  <Mail className="w-4 h-4" />
+                <div className="flex items-center gap-1.5">
+                  <Mail className="w-4 h-4" style={{ color: `hsl(${colorTheme.primary})` }} />
                   {isEditing ? (
                     <Input
                       value={currentData.personalInfo.email}
                       onChange={(e) => updateField(['personalInfo', 'email'], e.target.value)}
-                      className="text-sm h-6 border-0 p-0 bg-transparent"
+                      className="text-sm h-6 border-0 p-0 bg-transparent w-48"
                     />
                   ) : (
-                    currentData.personalInfo.email
+                    <span>{currentData.personalInfo.email}</span>
                   )}
                 </div>
               )}
               {currentData.personalInfo.birthDate && (
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4" style={{ color: `hsl(${colorTheme.primary})` }} />
                   {isEditing ? (
                     <Input
                       type="date"
@@ -177,23 +195,13 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
                       className="text-sm h-6 border-0 p-0 bg-transparent"
                     />
                   ) : (
-                    new Date(currentData.personalInfo.birthDate).toLocaleDateString('pt-BR')
+                    <span>{new Date(currentData.personalInfo.birthDate).toLocaleDateString('pt-BR')}</span>
                   )}
                 </div>
               )}
             </div>
           </div>
-          
-          {photoUrl && (
-            <div className="ml-6">
-              <img
-                src={photoUrl}
-                alt="Foto profissional"
-                className="w-24 h-24 object-cover rounded-lg border-2 border-primary/20"
-              />
-            </div>
-          )}
-        </div>
+        </header>
 
         {/* Professional Summary */}
         {currentData.summary && (
