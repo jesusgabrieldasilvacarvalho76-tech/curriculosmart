@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Sparkles, Download, MessageCircle, Share2, LogIn, LogOut, Crown } from 'lucide-react';
+import { FileText, Sparkles, Download, MessageCircle, Share2, LogIn, LogOut, Crown, Mail } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
 const Index = () => {
@@ -142,9 +142,61 @@ const Index = () => {
     }
   };
 
-  const handleShareWhatsApp = () => {
+  const generatePdfBlob = async (): Promise<Blob | null> => {
+    try {
+      const element = document.getElementById('resume-preview');
+      if (!element) return null;
+
+      const opt = {
+        margin: [0.5, 0.5, 0.5, 0.5] as [number, number, number, number],
+        filename: `curriculo-${resumeData?.personalInfo.fullName.replace(/\s+/g, '-').toLowerCase()}.pdf`,
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff'
+        },
+        jsPDF: { 
+          unit: 'in' as const, 
+          format: 'a4' as const, 
+          orientation: 'portrait' as const
+        }
+      };
+
+      const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
+      return pdfBlob;
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      return null;
+    }
+  };
+
+  const handleShareWhatsApp = async () => {
     if (!resumeData) return;
     
+    // Check if Web Share API is available and supports files
+    if (navigator.share && navigator.canShare) {
+      try {
+        const pdfBlob = await generatePdfBlob();
+        if (pdfBlob) {
+          const file = new File([pdfBlob], `curriculo-${resumeData.personalInfo.fullName.replace(/\s+/g, '-').toLowerCase()}.pdf`, { type: 'application/pdf' });
+          
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: `Currículo - ${resumeData.personalInfo.fullName}`,
+              text: `Olá! Confira meu currículo profissional.\n\n🎯 ${resumeData.personalInfo.fullName}\n💼 ${resumeData.professionalInfo.desiredPosition}`,
+              files: [file]
+            });
+            return;
+          }
+        }
+      } catch (error) {
+        console.log('Erro no compartilhamento com arquivo, usando fallback:', error);
+      }
+    }
+    
+    // Fallback: open WhatsApp with text only
     const message = `Olá! Acabei de criar meu currículo profissional. 
     
 🎯 *${resumeData.personalInfo.fullName}*
@@ -160,9 +212,13 @@ Criei usando um gerador profissional de currículos!`;
     window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
   };
 
-  const handleShareLinkedIn = () => {
+  const handleShareLinkedIn = async () => {
     if (!resumeData) return;
     
+    // Download PDF first for LinkedIn
+    await handleExportPDF();
+    
+    // Open LinkedIn share
     const summary = encodeURIComponent(`Acabei de atualizar meu perfil profissional! 
 
 🎯 ${resumeData.professionalInfo.desiredPosition}
@@ -171,35 +227,91 @@ ${resumeData.summary}
 #OpenToWork #${resumeData.professionalInfo.desiredPosition.replace(/\s+/g, '')}`);
     
     window.open(`https://www.linkedin.com/feed/?shareActive=true&text=${summary}`, '_blank');
+    
+    toast({
+      title: "PDF baixado!",
+      description: "Anexe o PDF na sua publicação do LinkedIn.",
+    });
+  };
+
+  const handleShareEmail = async () => {
+    if (!resumeData) return;
+    
+    // Try to share with file attachment
+    if (navigator.share && navigator.canShare) {
+      try {
+        const pdfBlob = await generatePdfBlob();
+        if (pdfBlob) {
+          const file = new File([pdfBlob], `curriculo-${resumeData.personalInfo.fullName.replace(/\s+/g, '-').toLowerCase()}.pdf`, { type: 'application/pdf' });
+          
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: `Currículo - ${resumeData.personalInfo.fullName}`,
+              text: `Segue meu currículo profissional em anexo.`,
+              files: [file]
+            });
+            return;
+          }
+        }
+      } catch (error) {
+        console.log('Erro no compartilhamento com arquivo, usando fallback:', error);
+      }
+    }
+    
+    // Fallback: open mailto
+    const subject = encodeURIComponent(`Currículo - ${resumeData.personalInfo.fullName}`);
+    const body = encodeURIComponent(`Olá,
+
+Segue meu currículo profissional.
+
+🎯 ${resumeData.personalInfo.fullName}
+📧 ${resumeData.personalInfo.email}
+📱 ${resumeData.personalInfo.phone}
+💼 ${resumeData.professionalInfo.desiredPosition}
+
+${resumeData.summary}
+
+Atenciosamente,
+${resumeData.personalInfo.fullName}`);
+    
+    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+    
+    // Also download PDF
+    await handleExportPDF();
+    toast({
+      title: "PDF baixado!",
+      description: "Anexe o PDF no seu e-mail.",
+    });
   };
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
       <header className="bg-card shadow-card border-b">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
-                <FileText className="w-6 h-6 text-primary-foreground" />
+        <div className="container mx-auto px-4 py-4 md:py-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3 text-center sm:text-left">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-primary rounded-xl flex items-center justify-center flex-shrink-0">
+                <FileText className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" />
               </div>
-              <div>
-                <h1 className="text-heading-lg text-foreground">
-                  Criador de Currículos Profissionais
+              <div className="min-w-0">
+                <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground truncate">
+                  Criador de Currículos
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">
                   Crie seu currículo perfeito em minutos com IA
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-wrap justify-center">
               {user ? (
                 <>
                   {subscribed ? (
                     <Button 
                       variant="outline" 
-                      className="gap-2"
+                      size="sm"
+                      className="gap-1.5 text-xs md:text-sm"
                       onClick={() => {
                         checkSubscription();
                         toast({
@@ -208,27 +320,28 @@ ${resumeData.summary}
                         });
                       }}
                     >
-                      <Crown className="w-4 h-4 text-yellow-500" />
-                      Plano Pro
+                      <Crown className="w-3.5 h-3.5 md:w-4 md:h-4 text-yellow-500" />
+                      <span className="hidden xs:inline">Plano</span> Pro
                     </Button>
                   ) : (
                     <Button 
                       variant="default" 
-                      className="gap-2"
+                      size="sm"
+                      className="gap-1.5 text-xs md:text-sm"
                       onClick={() => navigate('/plans')}
                     >
-                      <Crown className="w-4 h-4" />
-                      Assinar Pro
+                      <Crown className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                      <span className="hidden xs:inline">Assinar</span> Pro
                     </Button>
                   )}
-                  <Button variant="outline" className="gap-2" onClick={signOut}>
-                    <LogOut className="w-4 h-4" />
-                    Sair
+                  <Button variant="outline" size="sm" className="gap-1.5 text-xs md:text-sm" onClick={signOut}>
+                    <LogOut className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    <span className="hidden sm:inline">Sair</span>
                   </Button>
                 </>
               ) : (
-                <Button className="gap-2" onClick={() => navigate('/auth')}>
-                  <LogIn className="w-4 h-4" />
+                <Button size="sm" className="gap-1.5 text-xs md:text-sm" onClick={() => navigate('/auth')}>
+                  <LogIn className="w-3.5 h-3.5 md:w-4 md:h-4" />
                   Entrar
                 </Button>
               )}
@@ -258,33 +371,44 @@ ${resumeData.summary}
           {/* Preview Section */}
           <div className="space-y-6">
             {resumeData && (
-              <div className="bg-gradient-accent p-4 rounded-lg shadow-elegant">
-                <h3 className="text-white font-bold text-lg mb-3 flex items-center gap-2">
-                  <Share2 className="w-5 h-5" />
-                  Seu currículo está pronto! Compartilhe agora:
+              <div className="bg-gradient-accent p-3 md:p-4 rounded-lg shadow-elegant">
+                <h3 className="text-white font-bold text-sm md:text-lg mb-3 flex items-center gap-2">
+                  <Share2 className="w-4 h-4 md:w-5 md:h-5" />
+                  Currículo pronto! Compartilhe:
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3">
                   <Button 
                     onClick={handleExportPDF} 
                     variant="secondary"
-                    className="gap-2 font-bold bg-white text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                    size="sm"
+                    className="gap-1.5 text-xs md:text-sm font-bold bg-white text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
                   >
-                    <Download className="w-4 h-4" />
-                    Baixar PDF
+                    <Download className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    PDF
                   </Button>
                   <Button 
                     onClick={handleShareWhatsApp}
-                    className="gap-2 font-bold bg-green-600 hover:bg-green-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                    size="sm"
+                    className="gap-1.5 text-xs md:text-sm font-bold bg-green-600 hover:bg-green-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl"
                   >
-                    <MessageCircle className="w-4 h-4" />
+                    <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4" />
                     WhatsApp
                   </Button>
                   <Button 
                     onClick={handleShareLinkedIn}
-                    className="gap-2 font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                    size="sm"
+                    className="gap-1.5 text-xs md:text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl"
                   >
-                    <Share2 className="w-4 h-4" />
+                    <Share2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                     LinkedIn
+                  </Button>
+                  <Button 
+                    onClick={handleShareEmail}
+                    size="sm"
+                    className="gap-1.5 text-xs md:text-sm font-bold bg-red-500 hover:bg-red-600 text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                  >
+                    <Mail className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    E-mail
                   </Button>
                 </div>
               </div>

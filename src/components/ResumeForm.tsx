@@ -302,7 +302,7 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <div className="flex items-center gap-2">
                   <Label htmlFor="birthDate">Data de Nascimento</Label>
@@ -506,7 +506,7 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
                 <Trash2 className="h-4 w-4" />
               </Button>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label>Nível *</Label>
                   <Select 
@@ -614,7 +614,7 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
                 <Trash2 className="h-4 w-4" />
               </Button>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label>Idioma *</Label>
                   <Input
@@ -693,7 +693,7 @@ export const ResumeForm = ({ onFormChange, onGenerate, isGenerating }: ResumeFor
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label>Instituição *</Label>
                   <Input
