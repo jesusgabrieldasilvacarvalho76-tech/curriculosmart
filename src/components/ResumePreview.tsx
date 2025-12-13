@@ -81,28 +81,28 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-heading-md">Preview do Currículo</h2>
-        <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h2 className="text-lg md:text-xl font-semibold">Preview do Currículo</h2>
+        <div className="flex flex-wrap gap-2">
           {isEditing ? (
             <>
-              <Button onClick={handleSave} variant="gradient" className="flex items-center gap-2">
-                <Save className="w-4 h-4" />
+              <Button onClick={handleSave} variant="gradient" size="sm" className="flex items-center gap-1.5 text-xs md:text-sm">
+                <Save className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 Salvar
               </Button>
-              <Button onClick={handleCancel} variant="outline" className="flex items-center gap-2">
-                <X className="w-4 h-4" />
+              <Button onClick={handleCancel} variant="outline" size="sm" className="flex items-center gap-1.5 text-xs md:text-sm">
+                <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 Cancelar
               </Button>
             </>
           ) : (
             <>
-              <Button onClick={handleEdit} variant="outline" className="flex items-center gap-2">
-                <Edit2 className="w-4 h-4" />
+              <Button onClick={handleEdit} variant="outline" size="sm" className="flex items-center gap-1.5 text-xs md:text-sm">
+                <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 Editar
               </Button>
-              <Button onClick={onExportPDF} variant="gradient" className="flex items-center gap-2">
-                <Download className="w-4 h-4" />
+              <Button onClick={onExportPDF} variant="gradient" size="sm" className="flex items-center gap-1.5 text-xs md:text-sm">
+                <Download className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 Exportar PDF
               </Button>
             </>
@@ -112,7 +112,7 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
 
       <Card 
         id="resume-preview" 
-        className="p-8 shadow-card print:shadow-none print:border-none"
+        className="p-4 md:p-8 shadow-card print:shadow-none print:border-none overflow-x-auto"
         style={{ 
           backgroundColor: `hsl(${colorTheme.background})`,
           color: `hsl(${colorTheme.foreground})`,
@@ -289,7 +289,7 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
                 placeholder="Separe as habilidades por vírgula"
               />
             ) : (
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {currentData.skills.map((skill, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <div 
@@ -352,7 +352,7 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
             >
               Idiomas
             </h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {currentData.languages.map((lang, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <div 
