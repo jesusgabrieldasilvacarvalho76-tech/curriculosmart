@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ResumeForm } from '@/components/ResumeForm';
 import { ResumePreview } from '@/components/ResumePreview';
+import { ResumeHistory } from '@/components/ResumeHistory';
 import { ColorCustomizer, ColorTheme } from '@/components/ColorCustomizer';
 import { generateResumeData } from '@/utils/resumeGenerator';
 import { FormData, ResumeData } from '@/types/resume';
@@ -9,14 +10,18 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Sparkles, Download, MessageCircle, Share2, LogIn, LogOut, Crown, Mail } from 'lucide-react';
+import { FileText, Sparkles, Download, MessageCircle, Share2, LogIn, LogOut, Crown, Mail, Save } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const [formData, setFormData] = useState<FormData | null>(null);
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [photoUrl, setPhotoUrl] = useState<string>();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [currentResumeId, setCurrentResumeId] = useState<string | null>(null);
+  const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0);
   const [selectedTheme, setSelectedTheme] = useState<ColorTheme>({
     primary: "214 84% 56%",
     accent: "45 93% 47%",
@@ -93,6 +98,84 @@ const Index = () => {
       title: "Currículo Atualizado! ✨",
       description: "Suas alterações foram salvas com sucesso.",
     });
+  };
+
+  const handleSaveResume = async () => {
+    if (!resumeData || !user) return;
+
+    setIsSaving(true);
+    try {
+      const resumePayload = {
+        user_id: user.id,
+        title: `Currículo - ${resumeData.personalInfo.fullName}`,
+        personal_info: JSON.parse(JSON.stringify(resumeData.personalInfo)),
+        professional_info: JSON.parse(JSON.stringify(resumeData.professionalInfo)),
+        summary: resumeData.summary,
+        skills: resumeData.skills,
+        education: resumeData.education,
+        languages: JSON.parse(JSON.stringify(resumeData.languages)),
+        certifications: JSON.parse(JSON.stringify(resumeData.certifications)),
+        photo_url: photoUrl || null,
+        color_theme: JSON.parse(JSON.stringify(selectedTheme)),
+      };
+
+      if (currentResumeId) {
+        // Update existing resume
+        const { error } = await supabase
+          .from('resumes')
+          .update(resumePayload)
+          .eq('id', currentResumeId);
+
+        if (error) throw error;
+        
+        toast({
+          title: "Currículo Atualizado! ✨",
+          description: "Suas alterações foram salvas no histórico.",
+        });
+      } else {
+        // Create new resume
+        const { data, error } = await supabase
+          .from('resumes')
+          .insert(resumePayload)
+          .select('id')
+          .single();
+
+        if (error) throw error;
+        
+        setCurrentResumeId(data.id);
+        toast({
+          title: "Currículo Salvo! ✨",
+          description: "Seu currículo foi adicionado ao histórico.",
+        });
+      }
+      
+      setHistoryRefreshTrigger(prev => prev + 1);
+    } catch (error) {
+      console.error('Erro ao salvar currículo:', error);
+      toast({
+        title: "Erro ao Salvar",
+        description: "Não foi possível salvar o currículo. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleLoadResume = (resume: ResumeData, loadedPhotoUrl: string | null, theme: ColorTheme | null, resumeId: string) => {
+    setResumeData(resume);
+    setPhotoUrl(loadedPhotoUrl || undefined);
+    if (theme) {
+      setSelectedTheme(theme);
+    }
+    setCurrentResumeId(resumeId);
+  };
+
+  const handleNewResume = () => {
+    setResumeData(null);
+    setPhotoUrl(undefined);
+    setCurrentResumeId(null);
+    setFormData(null);
   };
 
   const handleExportPDF = async () => {
@@ -355,6 +438,14 @@ ${resumeData.personalInfo.fullName}`);
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Form Section */}
           <div className="space-y-6">
+            {/* Resume History */}
+            {user && (
+              <ResumeHistory 
+                onLoadResume={handleLoadResume}
+                refreshTrigger={historyRefreshTrigger}
+              />
+            )}
+
             <ResumeForm
               onFormChange={handleFormChange}
               onGenerate={handleGenerateResume}
@@ -372,10 +463,33 @@ ${resumeData.personalInfo.fullName}`);
           <div className="space-y-6">
             {resumeData && (
               <div className="bg-gradient-accent p-3 md:p-4 rounded-lg shadow-elegant">
-                <h3 className="text-white font-bold text-sm md:text-lg mb-3 flex items-center gap-2">
-                  <Share2 className="w-4 h-4 md:w-5 md:h-5" />
-                  Currículo pronto! Compartilhe:
-                </h3>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <h3 className="text-white font-bold text-sm md:text-lg flex items-center gap-2">
+                    <Share2 className="w-4 h-4 md:w-5 md:h-5" />
+                    Currículo pronto!
+                  </h3>
+                  <div className="flex gap-2">
+                    {currentResumeId && (
+                      <Button 
+                        onClick={handleNewResume}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs bg-white/20 border-white/30 text-white hover:bg-white/30"
+                      >
+                        Novo
+                      </Button>
+                    )}
+                    <Button 
+                      onClick={handleSaveResume}
+                      disabled={isSaving}
+                      size="sm"
+                      className="gap-1.5 text-xs font-bold bg-white text-accent hover:bg-white/90"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      {isSaving ? 'Salvando...' : currentResumeId ? 'Atualizar' : 'Salvar'}
+                    </Button>
+                  </div>
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3">
                   <Button 
                     onClick={handleExportPDF} 
