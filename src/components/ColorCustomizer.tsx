@@ -120,11 +120,11 @@ export const ColorCustomizer = ({ selectedTheme, onThemeChange }: ColorCustomize
             <Button
               key={colorTheme.name}
               variant={selectedTheme.primary === colorTheme.theme.primary ? "default" : "outline"}
-              className="h-auto p-3 justify-start"
+              className="h-auto p-3 justify-start overflow-hidden"
               onClick={() => onThemeChange(colorTheme.theme)}
             >
-              <div className="flex items-center gap-3 w-full">
-                <div className="flex gap-1">
+              <div className="flex items-center gap-2 w-full min-w-0">
+                <div className="flex gap-1 flex-shrink-0">
                   <div 
                     className="w-4 h-4 rounded-full border border-white/20"
                     style={{ backgroundColor: `hsl(${colorTheme.theme.primary})` }}
@@ -134,7 +134,7 @@ export const ColorCustomizer = ({ selectedTheme, onThemeChange }: ColorCustomize
                     style={{ backgroundColor: `hsl(${colorTheme.theme.accent})` }}
                   />
                 </div>
-                <span className="text-sm font-medium">{colorTheme.name}</span>
+                <span className="text-xs font-medium truncate">{colorTheme.name}</span>
               </div>
             </Button>
           ))}
