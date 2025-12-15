@@ -368,33 +368,33 @@ ${resumeData.personalInfo.fullName}`);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-gradient-subtle overflow-x-hidden">
       {/* Header */}
       <header className="bg-card shadow-card border-b">
-        <div className="container mx-auto px-4 py-4 md:py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3 text-center sm:text-left">
-              <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-primary rounded-xl flex items-center justify-center flex-shrink-0">
-                <FileText className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" />
+        <div className="container mx-auto px-3 sm:px-4 py-3 md:py-6">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-primary rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-primary-foreground" />
               </div>
-              <div className="min-w-0">
-                <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground truncate">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground truncate">
                   Criador de Currículos
                 </h1>
-                <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">
-                  Crie seu currículo perfeito em minutos com IA
+                <p className="text-xs text-muted-foreground hidden sm:block truncate">
+                  Crie seu currículo perfeito em minutos
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-2 flex-wrap justify-center">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
               {user ? (
                 <>
                   {subscribed ? (
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="gap-1.5 text-xs md:text-sm"
+                      className="gap-1 text-xs px-2 sm:px-3"
                       onClick={() => {
                         checkSubscription();
                         toast({
@@ -403,29 +403,29 @@ ${resumeData.personalInfo.fullName}`);
                         });
                       }}
                     >
-                      <Crown className="w-3.5 h-3.5 md:w-4 md:h-4 text-yellow-500" />
-                      <span className="hidden xs:inline">Plano</span> Pro
+                      <Crown className="w-3.5 h-3.5 text-yellow-500" />
+                      <span className="hidden sm:inline">Pro</span>
                     </Button>
                   ) : (
                     <Button 
                       variant="default" 
                       size="sm"
-                      className="gap-1.5 text-xs md:text-sm"
+                      className="gap-1 text-xs px-2 sm:px-3"
                       onClick={() => navigate('/plans')}
                     >
-                      <Crown className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                      <span className="hidden xs:inline">Assinar</span> Pro
+                      <Crown className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Assinar</span>
                     </Button>
                   )}
-                  <Button variant="outline" size="sm" className="gap-1.5 text-xs md:text-sm" onClick={signOut}>
-                    <LogOut className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                  <Button variant="outline" size="sm" className="gap-1 text-xs px-2 sm:px-3" onClick={signOut}>
+                    <LogOut className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Sair</span>
                   </Button>
                 </>
               ) : (
-                <Button size="sm" className="gap-1.5 text-xs md:text-sm" onClick={() => navigate('/auth')}>
-                  <LogIn className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                  Entrar
+                <Button size="sm" className="gap-1 text-xs px-2 sm:px-3" onClick={() => navigate('/auth')}>
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Entrar</span>
                 </Button>
               )}
             </div>
@@ -434,7 +434,7 @@ ${resumeData.personalInfo.fullName}`);
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Form Section */}
           <div className="space-y-6">
@@ -460,21 +460,21 @@ ${resumeData.personalInfo.fullName}`);
           </div>
 
           {/* Preview Section */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {resumeData && (
-              <div className="bg-gradient-accent p-3 md:p-4 rounded-lg shadow-elegant">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                  <h3 className="text-white font-bold text-sm md:text-lg flex items-center gap-2">
-                    <Share2 className="w-4 h-4 md:w-5 md:h-5" />
-                    Currículo pronto!
+              <div className="bg-gradient-accent p-2.5 sm:p-3 md:p-4 rounded-lg shadow-elegant">
+                <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3">
+                  <h3 className="text-white font-bold text-xs sm:text-sm md:text-lg flex items-center gap-1.5 sm:gap-2 truncate">
+                    <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0" />
+                    <span className="truncate">Currículo pronto!</span>
                   </h3>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5 sm:gap-2 flex-shrink-0">
                     {currentResumeId && (
                       <Button 
                         onClick={handleNewResume}
                         variant="outline"
                         size="sm"
-                        className="text-xs bg-white/20 border-white/30 text-white hover:bg-white/30"
+                        className="text-xs px-2 sm:px-3 bg-white/20 border-white/30 text-white hover:bg-white/30"
                       >
                         Novo
                       </Button>
@@ -483,46 +483,47 @@ ${resumeData.personalInfo.fullName}`);
                       onClick={handleSaveResume}
                       disabled={isSaving}
                       size="sm"
-                      className="gap-1.5 text-xs font-bold bg-white text-accent hover:bg-white/90"
+                      className="gap-1 text-xs px-2 sm:px-3 font-bold bg-white text-accent hover:bg-white/90"
                     >
-                      <Save className="w-3.5 h-3.5" />
-                      {isSaving ? 'Salvando...' : currentResumeId ? 'Atualizar' : 'Salvar'}
+                      <Save className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                      <span className="hidden sm:inline">{isSaving ? 'Salvando...' : currentResumeId ? 'Atualizar' : 'Salvar'}</span>
+                      <span className="sm:hidden">{isSaving ? '...' : 'Salvar'}</span>
                     </Button>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3">
+                <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
                   <Button 
                     onClick={handleExportPDF} 
                     variant="secondary"
                     size="sm"
-                    className="gap-1.5 text-xs md:text-sm font-bold bg-white text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                    className="gap-1 text-xs font-bold bg-white text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl px-2 sm:px-3"
                   >
-                    <Download className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                    PDF
+                    <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                    <span className="truncate">PDF</span>
                   </Button>
                   <Button 
                     onClick={handleShareWhatsApp}
                     size="sm"
-                    className="gap-1.5 text-xs md:text-sm font-bold bg-green-600 hover:bg-green-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                    className="gap-1 text-xs font-bold bg-green-600 hover:bg-green-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl px-2 sm:px-3"
                   >
-                    <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                    WhatsApp
+                    <MessageCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                    <span className="truncate">WhatsApp</span>
                   </Button>
                   <Button 
                     onClick={handleShareLinkedIn}
                     size="sm"
-                    className="gap-1.5 text-xs md:text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                    className="gap-1 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl px-2 sm:px-3"
                   >
-                    <Share2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                    LinkedIn
+                    <Share2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                    <span className="truncate">LinkedIn</span>
                   </Button>
                   <Button 
                     onClick={handleShareEmail}
                     size="sm"
-                    className="gap-1.5 text-xs md:text-sm font-bold bg-red-500 hover:bg-red-600 text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+                    className="gap-1 text-xs font-bold bg-red-500 hover:bg-red-600 text-white transition-all duration-300 shadow-lg hover:shadow-xl px-2 sm:px-3"
                   >
-                    <Mail className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                    E-mail
+                    <Mail className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                    <span className="truncate">E-mail</span>
                   </Button>
                 </div>
               </div>

@@ -80,30 +80,30 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <h2 className="text-lg md:text-xl font-semibold">Preview do Currículo</h2>
-        <div className="flex flex-wrap gap-2">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-sm sm:text-lg md:text-xl font-semibold truncate">Preview do Currículo</h2>
+        <div className="flex gap-1.5 sm:gap-2 flex-shrink-0">
           {isEditing ? (
             <>
-              <Button onClick={handleSave} variant="gradient" size="sm" className="flex items-center gap-1.5 text-xs md:text-sm">
-                <Save className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                Salvar
+              <Button onClick={handleSave} variant="gradient" size="sm" className="flex items-center gap-1 text-xs px-2 sm:px-3">
+                <Save className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span className="hidden sm:inline">Salvar</span>
               </Button>
-              <Button onClick={handleCancel} variant="outline" size="sm" className="flex items-center gap-1.5 text-xs md:text-sm">
-                <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                Cancelar
+              <Button onClick={handleCancel} variant="outline" size="sm" className="flex items-center gap-1 text-xs px-2 sm:px-3">
+                <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span className="hidden sm:inline">Cancelar</span>
               </Button>
             </>
           ) : (
             <>
-              <Button onClick={handleEdit} variant="outline" size="sm" className="flex items-center gap-1.5 text-xs md:text-sm">
-                <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                Editar
+              <Button onClick={handleEdit} variant="outline" size="sm" className="flex items-center gap-1 text-xs px-2 sm:px-3">
+                <Edit2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span className="hidden sm:inline">Editar</span>
               </Button>
-              <Button onClick={onExportPDF} variant="gradient" size="sm" className="flex items-center gap-1.5 text-xs md:text-sm">
-                <Download className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                Exportar PDF
+              <Button onClick={onExportPDF} variant="gradient" size="sm" className="flex items-center gap-1 text-xs px-2 sm:px-3">
+                <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span className="hidden sm:inline">PDF</span>
               </Button>
             </>
           )}
@@ -112,7 +112,7 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
 
       <Card 
         id="resume-preview" 
-        className="p-4 md:p-8 shadow-card print:shadow-none print:border-none overflow-x-auto"
+        className="p-3 sm:p-4 md:p-8 shadow-card print:shadow-none print:border-none overflow-hidden"
         style={{ 
           backgroundColor: `hsl(${colorTheme.background})`,
           color: `hsl(${colorTheme.foreground})`,
@@ -120,14 +120,14 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
         }}
       >
         {/* Header Section - Professional Layout */}
-        <header className="flex flex-col md:flex-row items-center md:items-center gap-4 mb-8 pb-6 border-b" style={{ borderColor: 'hsl(0 0% 85%)' }}>
+        <header className="flex flex-col sm:flex-row items-center sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8 pb-4 sm:pb-6 border-b" style={{ borderColor: 'hsl(0 0% 85%)' }}>
           {/* Photo - Left side on desktop, top on mobile */}
           {photoUrl && (
             <div className="flex-shrink-0">
               <img
                 src={photoUrl}
                 alt="Foto profissional"
-                className="w-[90px] h-[90px] object-cover rounded-lg"
+                className="w-[70px] h-[70px] sm:w-[90px] sm:h-[90px] object-cover rounded-lg"
                 style={{ 
                   border: `2px solid hsl(${colorTheme.primary})`,
                   borderRadius: '8px'
@@ -137,17 +137,17 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
           )}
           
           {/* Name and Contact Info - Right side */}
-          <div className="flex-1 text-center md:text-left">
+          <div className="flex-1 text-center sm:text-left min-w-0 w-full">
             {isEditing ? (
               <Input
                 value={currentData.personalInfo.fullName}
                 onChange={(e) => updateField(['personalInfo', 'fullName'], e.target.value)}
-                className="text-2xl md:text-3xl font-bold mb-2 border-0 p-0 h-auto bg-transparent"
+                className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 border-0 p-0 h-auto bg-transparent"
                 style={{ color: 'hsl(0 0% 15%)' }}
               />
             ) : (
               <h1 
-                className="text-2xl md:text-3xl font-bold mb-2"
+                className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 break-words"
                 style={{ color: 'hsl(0 0% 15%)' }}
               >
                 {currentData.personalInfo.fullName}
@@ -155,44 +155,44 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
             )}
             
             {/* Contact info in a single line */}
-            <div className="flex flex-wrap justify-center md:justify-start items-center gap-4 text-sm" style={{ color: 'hsl(0 0% 45%)' }}>
+            <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2 sm:gap-4 text-xs sm:text-sm" style={{ color: 'hsl(0 0% 45%)' }}>
               {currentData.personalInfo.phone && (
-                <div className="flex items-center gap-1.5">
-                  <Phone className="w-4 h-4" style={{ color: `hsl(${colorTheme.primary})` }} />
+                <div className="flex items-center gap-1">
+                  <Phone className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" style={{ color: `hsl(${colorTheme.primary})` }} />
                   {isEditing ? (
                     <Input
                       value={currentData.personalInfo.phone}
                       onChange={(e) => updateField(['personalInfo', 'phone'], e.target.value)}
-                      className="text-sm h-6 border-0 p-0 bg-transparent w-32"
+                      className="text-xs sm:text-sm h-5 sm:h-6 border-0 p-0 bg-transparent w-24 sm:w-32"
                     />
                   ) : (
-                    <span>{currentData.personalInfo.phone}</span>
+                    <span className="truncate">{currentData.personalInfo.phone}</span>
                   )}
                 </div>
               )}
               {currentData.personalInfo.email && (
-                <div className="flex items-center gap-1.5">
-                  <Mail className="w-4 h-4" style={{ color: `hsl(${colorTheme.primary})` }} />
+                <div className="flex items-center gap-1 min-w-0">
+                  <Mail className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" style={{ color: `hsl(${colorTheme.primary})` }} />
                   {isEditing ? (
                     <Input
                       value={currentData.personalInfo.email}
                       onChange={(e) => updateField(['personalInfo', 'email'], e.target.value)}
-                      className="text-sm h-6 border-0 p-0 bg-transparent w-48"
+                      className="text-xs sm:text-sm h-5 sm:h-6 border-0 p-0 bg-transparent w-32 sm:w-48"
                     />
                   ) : (
-                    <span>{currentData.personalInfo.email}</span>
+                    <span className="truncate max-w-[120px] sm:max-w-none">{currentData.personalInfo.email}</span>
                   )}
                 </div>
               )}
               {currentData.personalInfo.birthDate && (
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4" style={{ color: `hsl(${colorTheme.primary})` }} />
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" style={{ color: `hsl(${colorTheme.primary})` }} />
                   {isEditing ? (
                     <Input
                       type="date"
                       value={currentData.personalInfo.birthDate}
                       onChange={(e) => updateField(['personalInfo', 'birthDate'], e.target.value)}
-                      className="text-sm h-6 border-0 p-0 bg-transparent"
+                      className="text-xs sm:text-sm h-5 sm:h-6 border-0 p-0 bg-transparent"
                     />
                   ) : (
                     <span>{new Date(currentData.personalInfo.birthDate).toLocaleDateString('pt-BR')}</span>
@@ -205,9 +205,9 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
 
         {/* Professional Summary */}
         {currentData.summary && (
-          <section className="mb-8">
+          <section className="mb-6 sm:mb-8">
             <h2 
-              className="text-heading-sm pb-2 mb-4 border-b-2"
+              className="text-sm sm:text-heading-sm pb-2 mb-3 sm:mb-4 border-b-2"
               style={{ 
                 color: `hsl(${colorTheme.primary})`,
                 borderColor: `hsl(${colorTheme.primary} / 0.2)`
@@ -219,11 +219,11 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
               <Textarea
                 value={currentData.summary}
                 onChange={(e) => updateField(['summary'], e.target.value)}
-                className="text-foreground leading-relaxed border-0 p-0 bg-transparent resize-none"
+                className="text-xs sm:text-sm text-foreground leading-relaxed border-0 p-0 bg-transparent resize-none"
                 rows={3}
               />
             ) : (
-              <p className="text-foreground leading-relaxed">
+              <p className="text-xs sm:text-sm text-foreground leading-relaxed break-words">
                 {currentData.summary}
               </p>
             )}
@@ -231,9 +231,9 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
         )}
 
         {/* Professional Experience */}
-        <section className="mb-8">
+        <section className="mb-6 sm:mb-8">
           <h2 
-            className="text-heading-sm pb-2 mb-4 border-b-2"
+            className="text-sm sm:text-heading-sm pb-2 mb-3 sm:mb-4 border-b-2"
             style={{ 
               color: `hsl(${colorTheme.primary})`,
               borderColor: `hsl(${colorTheme.primary} / 0.2)`
@@ -245,19 +245,19 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
             <Textarea
               value={currentData.professionalInfo.experience}
               onChange={(e) => updateField(['professionalInfo', 'experience'], e.target.value)}
-              className="text-foreground leading-relaxed border-0 p-0 bg-transparent resize-none"
+              className="text-xs sm:text-sm text-foreground leading-relaxed border-0 p-0 bg-transparent resize-none"
               rows={6}
             />
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {currentData.professionalInfo.experience.split('\n').filter(exp => exp.trim()).map((experience, index) => (
-                <div key={index} className="flex gap-3">
+                <div key={index} className="flex gap-2 sm:gap-3">
                   <div 
-                    className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                    className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full mt-1.5 sm:mt-2 flex-shrink-0"
                     style={{ backgroundColor: `hsl(${colorTheme.accent})` }}
                   ></div>
                   <p 
-                    className="leading-relaxed"
+                    className="text-xs sm:text-sm leading-relaxed break-words"
                     style={{ color: `hsl(${colorTheme.foreground})` }}
                   >
                     {experience.trim()}
@@ -270,9 +270,9 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
 
         {/* Skills */}
         {currentData.skills.length > 0 && (
-          <section className="mb-8">
+          <section className="mb-6 sm:mb-8">
             <h2 
-              className="text-heading-sm pb-2 mb-4 border-b-2"
+              className="text-sm sm:text-heading-sm pb-2 mb-3 sm:mb-4 border-b-2"
               style={{ 
                 color: `hsl(${colorTheme.primary})`,
                 borderColor: `hsl(${colorTheme.primary} / 0.2)`
@@ -284,19 +284,19 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
               <Textarea
                 value={currentData.skills.join(', ')}
                 onChange={(e) => updateField(['skills'], e.target.value.split(',').map(s => s.trim()).filter(s => s))}
-                className="text-foreground leading-relaxed border-0 p-0 bg-transparent resize-none"
+                className="text-xs sm:text-sm text-foreground leading-relaxed border-0 p-0 bg-transparent resize-none"
                 rows={3}
                 placeholder="Separe as habilidades por vírgula"
               />
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
                 {currentData.skills.map((skill, index) => (
-                  <div key={index} className="flex items-center gap-2">
+                  <div key={index} className="flex items-center gap-1.5 sm:gap-2">
                     <div 
-                      className="w-2 h-2 rounded-full"
+                      className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0"
                       style={{ backgroundColor: `hsl(${colorTheme.accent})` }}
                     ></div>
-                    <span style={{ color: `hsl(${colorTheme.foreground})` }}>{skill}</span>
+                    <span className="text-xs sm:text-sm truncate" style={{ color: `hsl(${colorTheme.foreground})` }}>{skill}</span>
                   </div>
                 ))}
               </div>
@@ -306,9 +306,9 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
 
         {/* Education */}
         {currentData.education.length > 0 && (
-          <section className="mb-8">
+          <section className="mb-6 sm:mb-8">
             <h2 
-              className="text-heading-sm pb-2 mb-4 border-b-2"
+              className="text-sm sm:text-heading-sm pb-2 mb-3 sm:mb-4 border-b-2"
               style={{ 
                 color: `hsl(${colorTheme.primary})`,
                 borderColor: `hsl(${colorTheme.primary} / 0.2)`
@@ -320,19 +320,19 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
               <Textarea
                 value={currentData.education.join('\n')}
                 onChange={(e) => updateField(['education'], e.target.value.split('\n').filter(s => s.trim()))}
-                className="text-foreground leading-relaxed border-0 p-0 bg-transparent resize-none"
+                className="text-xs sm:text-sm text-foreground leading-relaxed border-0 p-0 bg-transparent resize-none"
                 rows={3}
                 placeholder="Uma qualificação por linha"
               />
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 {currentData.education.map((edu, index) => (
-                  <div key={index} className="flex gap-3">
+                  <div key={index} className="flex gap-2 sm:gap-3">
                     <div 
-                      className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                      className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full mt-1.5 sm:mt-2 flex-shrink-0"
                       style={{ backgroundColor: `hsl(${colorTheme.accent})` }}
                     ></div>
-                    <p style={{ color: `hsl(${colorTheme.foreground})` }}>{edu}</p>
+                    <p className="text-xs sm:text-sm break-words" style={{ color: `hsl(${colorTheme.foreground})` }}>{edu}</p>
                   </div>
                 ))}
               </div>
@@ -342,9 +342,9 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
 
         {/* Languages */}
         {currentData.languages && currentData.languages.length > 0 && (
-          <section className="mb-8">
+          <section className="mb-6 sm:mb-8">
             <h2 
-              className="text-heading-sm pb-2 mb-4 border-b-2"
+              className="text-sm sm:text-heading-sm pb-2 mb-3 sm:mb-4 border-b-2"
               style={{ 
                 color: `hsl(${colorTheme.primary})`,
                 borderColor: `hsl(${colorTheme.primary} / 0.2)`
@@ -352,14 +352,14 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
             >
               Idiomas
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-3">
               {currentData.languages.map((lang, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={index} className="flex items-center gap-1.5 sm:gap-2">
                   <div 
-                    className="w-2 h-2 rounded-full"
+                    className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0"
                     style={{ backgroundColor: `hsl(${colorTheme.accent})` }}
                   ></div>
-                  <span style={{ color: `hsl(${colorTheme.foreground})` }}>
+                  <span className="text-xs sm:text-sm" style={{ color: `hsl(${colorTheme.foreground})` }}>
                     {lang.name} - {lang.proficiency}
                   </span>
                 </div>
@@ -372,7 +372,7 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
         {currentData.certifications && currentData.certifications.length > 0 && (
           <section>
             <h2 
-              className="text-heading-sm pb-2 mb-4 border-b-2"
+              className="text-sm sm:text-heading-sm pb-2 mb-3 sm:mb-4 border-b-2"
               style={{ 
                 color: `hsl(${colorTheme.primary})`,
                 borderColor: `hsl(${colorTheme.primary} / 0.2)`
@@ -380,14 +380,14 @@ export const ResumePreview = ({ resumeData, photoUrl, onExportPDF, onUpdateResum
             >
               Certificações
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               {currentData.certifications.map((cert, index) => (
-                <div key={index} className="flex gap-3">
+                <div key={index} className="flex gap-2 sm:gap-3">
                   <div 
-                    className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                    className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full mt-1.5 sm:mt-2 flex-shrink-0"
                     style={{ backgroundColor: `hsl(${colorTheme.accent})` }}
                   ></div>
-                  <p style={{ color: `hsl(${colorTheme.foreground})` }}>
+                  <p className="text-xs sm:text-sm break-words" style={{ color: `hsl(${colorTheme.foreground})` }}>
                     {cert.name} - {cert.institution}
                     {cert.year && ` (${cert.year})`}
                   </p>
